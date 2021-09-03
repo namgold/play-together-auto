@@ -50,7 +50,7 @@ func generateInput()
     GUISetOnEvent($GUI_EVENT_CLOSE, "_Cancel", $Form1)
 
 
-    local const $ButtonGenerate = GUICtrlCreateButton("Generate", 48, 168, 75, 25)
+    local const $ButtonGenerate = GUICtrlCreateButton("Save settings", 48, 168, 80, 25)
     local const $ButtonCancel = GUICtrlCreateButton("Cancel", 144, 168, 75, 25)
     GUICtrlSetOnEvent($ButtonGenerate, '_Generate')
     GUICtrlSetOnEvent($ButtonCancel, '_Cancel')

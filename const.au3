@@ -1,4 +1,4 @@
-$inputPath = './input.ini'
+$inputPath = './settings.ini'
 
 $bagCloseButtonColorRed = dec('C33222')
 $bagCloseButtonColorWhite = dec('FFFFFF')

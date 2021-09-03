@@ -124,14 +124,18 @@ endfunc
 
 #region complex select
 func doBagStuff()
+    _log('Doing bag stuff')
     while isTabToolNotSelected()
+        _log('Clicking tab tool')
         clickTabTool()
     wend
 
     while isBagOpened() and not isOpenBagButtonShown()
         if rodCheckMarkExits() then
+            _log('Clicking close bag')
             clickCloseBag()
         Else
+            _log('Clicking select rod')
             clickSelectRod()
         endif
     wend

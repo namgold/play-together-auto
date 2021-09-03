@@ -21,23 +21,31 @@ func ExitToggle()
 EndFunc
 
 While True
-
-    _log('Open bag')
     local $startUsedRodTime
-    While isOpenBagButtonShown()
+    local $beginLoopTime
+    local $missedRod
+
+    _log('Spam rod-bag')
+    $beginLoopTime = TimerInit()
+    While isOpenBagButtonShown() and TimerDiff($beginLoopTime) < 5000
         $startUsedRodTime = TimerInit()
         clickUseRod()
         clickOpenBag()
     WEnd
 
     _log('Detecting is bag opened')
-    local $beginLoopTime = TimerInit()
+    sleep(200)
+    $beginLoopTime = TimerInit()
     while TimerDiff($beginLoopTime) < 5000
         if isBagOpened() then
-            _log('Doing bag stuff')
             doBagStuff()
+            _log('Wait for bag completely closed')
+            $beginLoopTime = TimerInit()
+            While not isOpenBagButtonShown() and TimerDiff($beginLoopTime) < 5000
+            WEnd
             _log('Clicking use rod')
-            While isOpenBagButtonShown()
+            $beginLoopTime = TimerInit()
+            While isOpenBagButtonShown() and TimerDiff($beginLoopTime) < 5000
                 $startUsedRodTime = TimerInit()
                 clickUseRod()
             WEnd
@@ -45,30 +53,34 @@ While True
         endif
     wend
 
+    $missedRod = false
     do ;sleep 13s and detect for is missed rod?
         local $currentTimeDiff = TimerDiff($startUsedRodTime)
         _log('Sleep 13s: ' & Round($currentTimeDiff/100)/10 & 's')
         if isOpenBagButtonShown() Then
-            alert('Missed rod')
+            _log('Missed rod')
             $missedRod = true
         EndIf
-    until $currentTimeDiff >= 13000
+    until $currentTimeDiff >= 13000 or $missedRod
+    if $missedRod then
+        ContinueLoop
+    endif
 
     Local $initColor = getCurrentExclaimationColor()
-    Local $beginLoopTime = TimerInit()
+    $beginLoopTime = TimerInit()
 
     _log('Detecting exclamimation')
     Local $currentColor
-    local $missedRod = false
+    $missedRod = false
     Do ;detecting exclaimation and detect for is missed rod?
         $currentTimeDiff = TimerDiff($beginLoopTime)
-        _log('Detecting exclamimation ' & String($currentTimeDiff > 50000) & ' ' & Round($currentTimeDiff/100)/10 & 's')
+        _log('Detecting exclamimation ' & ' ' & Round($currentTimeDiff/100)/10 & 's')
         $currentColor = getCurrentExclaimationColor()
         if isOpenBagButtonShown() Then
-            alert('Missed rod')
+            _log('Missed rod')
             $missedRod = true
         EndIf
-    Until ($initColor <> $currentColor Or $currentTimeDiff > 50000) and not $missedRod
+    Until $initColor <> $currentColor Or $currentTimeDiff > 50000 or $missedRod
 
     if $missedRod then
         ContinueLoop
