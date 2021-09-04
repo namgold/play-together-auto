@@ -42,8 +42,8 @@ $buttonTabTool1X = $screenscale * 1367
 $buttonTabTool1Y = $screenscale * 120
 $buttonTabTool1Color = dec('F46644')
 
-$buttonTabTool2X = $screenscale * 1385
-$buttonTabTool2Y = $screenscale * 117
+$buttonTabTool2X = $screenscale * 1384
+$buttonTabTool2Y = $screenscale * 90
 $buttonTabTool2Color = dec('FFB3A2')
 
 $buttonTabTool3X = $screenscale * 1407
