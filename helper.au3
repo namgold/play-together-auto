@@ -78,8 +78,13 @@ func clickDebounced($x, $y, $clicks = 1, $speed = 100, $clickspeed = 2)
     endif
 EndFunc
 
-func click($x, $y, $clicks = 1, $speed = 100, $clickspeed = 2)
-    MouseClick ($MOUSE_CLICK_LEFT, $x, $y, $clicks, $clickspeed)
+global $emu = WinGetHandle('Bộ giả lập android Nox')
+if @error <> 0 then
+    $emu = WinGetHandle('BlueStacks');
+endif
+
+func click($x, $y, $clicks = 1, $speed = 100)
+    ControlClick($emu, '', $emu, 'left', $clicks, $x, $y)
     sleep($speed)
 EndFunc
 
@@ -88,7 +93,7 @@ func clickUseRod()
 EndFunc
 
 func clickWithdrawRod()
-    click($buttonWithdrawRodX, $buttonWithdrawRodY, 10, 10, 0)
+    click($buttonWithdrawRodX, $buttonWithdrawRodY, 10, 10)
 EndFunc
 
 func clickOpenBag()
