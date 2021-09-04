@@ -10,12 +10,13 @@ local $loopCount = 0
 local $successCount = 0
 Local $logFile = FileOpen($logFilePath, 1)
 local $currentMsg = 'asd'
+local $consecutiveMissed = -1
 
 SplashTextOn($title, $currentMsg, '350', '35', '0', '0', 37, '', '', '')
 
 func _log($msg, $isWriteToLog = true)
     if ($msg <> $currentMsg) then
-        $formatedMsg = $successCount & '/' & $loopCount & ' ' & $msg
+        $formatedMsg = $consecutiveMissed & '/' & $successCount & '/' & $loopCount & ' ' & $msg
         ControlSetText($title, '', 'Static1', $formatedMsg)
         if $isWriteToLog then
             _FileWriteLog($logFile,  $formatedMsg)
@@ -26,10 +27,12 @@ EndFunc
 
 func _logLoopStarted()
     $loopCount = $loopCount + 1
+    $consecutiveMissed += 1
 EndFunc
 
 func _logFishSuccess()
     $successCount = $successCount + 1
+    $consecutiveMissed = -1
 EndFunc
 
 func clickClose()
