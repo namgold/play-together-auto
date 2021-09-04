@@ -8,15 +8,17 @@
 #include <const.au3>
 #include <generateInput.au3>
 
-global $exclaimationX
-global $exclaimationY
-global $rodPosition
+global $exclaimationX = 0
+global $exclaimationY = 0
+global $rodPosition = 1
+global $minimumIdleRod = 13
+global $maximumTimeFishing = 60
 
 func getInput()
     _log('Reading exclaimation position')
     if FileExists($inputPath) then
-        $exclaimationX = IniRead($inputPath, "Exclaimation Mark", "exclaimationX", "")
-        $exclaimationY = IniRead($inputPath, "Exclaimation Mark", "exclaimationY", "")
+        $exclaimationX = IniRead($inputPath, "Exclaimation Mark", "exclaimationX", 0)
+        $exclaimationY = IniRead($inputPath, "Exclaimation Mark", "exclaimationY", 0)
         $rodPosition = IniRead($inputPath, "General", "RodPosition", 1)
         $minimumIdleRod = IniRead($inputPath, "General", "MinimumIdleRod", 13)
         $maximumTimeFishing = IniRead($inputPath, "General", "MaximumTimeFishing", 60)
@@ -34,6 +36,10 @@ EndFunc
 func alert($msg)
     MsgBox($MB_SYSTEMMODAL, "Alert", $msg)
 EndFunc
+
+func pick($arrayPos)
+    return $arrayPos[$rodPosition] * $screenscale
+endfunc
 
 ;~ $hDC = _WinAPI_GetWindowDC(0) ; DC of entire screen (desktop)
 ;~ $hPen = _WinAPI_CreatePen($PS_SOLID, 5, 0)
@@ -83,8 +89,20 @@ func clickStoreTrash()
     click($buttonStoreTrashX, $buttonStoreTrashY, 1, 200)
 EndFunc
 
+func clickFixRod()
+    click(pick($buttonFixRodX), pick($buttonFixRodY), 1, 200)
+EndFunc
+
+func clickPayMoneyFixRod()
+    click($buttonPayMoneyFixRodX, $buttonPayMoneyFixRodY, 1, 200)
+EndFunc
+
+func clickFixedRod()
+    click($buttonFixedRodX, $buttonFixedRodY, 1, 200)
+EndFunc
+
 func clickSelectRod()
-    click($bagItemX[$rodPosition - 1] * $screenscale, $bagItemY[$rodPosition - 1] * $screenscale, 1, 200)
+    click(pick($bagItemX), pick($bagItemY), 1, 200)
 EndFunc
 #endregion
 
@@ -120,8 +138,20 @@ func isStoreTrashButtonShown()
 EndFunc
 
 func rodCheckMarkExits()
-    return PixelGetColor($rodCheckMarkX[$rodPosition - 1] * $screenscale, $rodCheckMarkY[$rodPosition - 1] * $screenscale) == $rodCheckMarkColor
+    return PixelGetColor(pick($rodCheckMarkX), pick($rodCheckMarkY)) == $rodCheckMarkColor
 endfunc
+
+func isRodNeedFix()
+    return PixelGetColor(pick($buttonFixRodX), pick($buttonFixRodY)) == $buttonFixRodColor
+EndFunc
+
+func isButtonPayMoneyFixRodShown()
+    return PixelGetColor($buttonPayMoneyFixRodX, $buttonPayMoneyFixRodY) == $buttonPayMoneyFixRodColor
+EndFunc
+
+func isButtonFixedRodShown()
+    return PixelGetColor($buttonFixedRodX, $buttonFixedRodY) == $buttonFixedRodColor
+EndFunc
 #endregion
 
 #region complex select
@@ -131,6 +161,21 @@ func doBagStuff()
         _log('Clicking tab tool')
         clickTabTool()
     wend
+
+    if isRodNeedFix() Then
+        while not isButtonPayMoneyFixRodShown()
+            clickFixRod()
+        wend
+        while isButtonPayMoneyFixRodShown()
+            clickPayMoneyFixRod()
+        wend
+        while not isButtonFixedRodShown()
+        wend
+        while isButtonFixedRodShown()
+            clickFixedRod()
+        wend
+
+    endif
 
     while isBagOpened() and not isOpenBagButtonShown()
         if rodCheckMarkExits() then

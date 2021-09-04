@@ -50,6 +50,18 @@ $buttonTabTool3X = $screenscale * 1407
 $buttonTabTool3Y = $screenscale * 134
 $buttonTabTool3Color = dec('FFFFFF')
 
+global $buttonFixRodX = [1095, 1397, 1687, 1095, 1397, 1687]
+global $buttonFixRodY = [523, 523, 523, 899, 899, 899]
+$buttonFixRodColor = dec('F15E4E')
+
+$buttonPayMoneyFixRodX = $screenscale * 960
+$buttonPayMoneyFixRodY = $screenscale * 849
+$buttonPayMoneyFixRodColor = dec('41C5F3')
+
+$buttonFixedRodX = $screenscale * 962
+$buttonFixedRodY = $screenscale * 845
+$buttonFixedRodColor = dec('41C5F3')
+
 global $rodCheckMarkX = [1086, 1377, 1672, 1086, 1377, 1672]
 global $rodCheckMarkY = [326, 326, 326, 705, 705, 705]
 $rodCheckMarkColor = dec('82FB28')
