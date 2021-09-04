@@ -56,6 +56,14 @@ func drawCross()
 EndFunc
 
 #region Button clicking
+global $timeStartClicked = TimerInit()
+func clickDebounced($x, $y, $clicks = 1, $speed = 100, $clickspeed = 2)
+    if (TimerDiff($timeStartClicked) > $speed)
+        $timeStartClicked = TimerInit()
+        MouseClick($MOUSE_CLICK_LEFT, $x, $y, $clicks, $clickspeed)
+    endif
+EndFunc
+
 func click($x, $y, $clicks = 1, $speed = 100, $clickspeed = 2)
     MouseClick ($MOUSE_CLICK_LEFT, $x, $y, $clicks, $clickspeed)
     sleep($speed)
@@ -90,7 +98,7 @@ func clickStoreTrash()
 EndFunc
 
 func clickFixRod()
-    click(pick($buttonFixRodX), pick($buttonFixRodY), 1, 200)
+    clickDebounced(pick($buttonFixRodX), pick($buttonFixRodY), 1, 2000)
 EndFunc
 
 func clickPayMoneyFixRod()
