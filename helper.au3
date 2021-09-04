@@ -38,7 +38,7 @@ func alert($msg)
 EndFunc
 
 func pick($arrayPos)
-    return $arrayPos[$rodPosition] * $screenscale
+    return $arrayPos[$rodPosition - 1] * $screenscale
 endfunc
 
 ;~ $hDC = _WinAPI_GetWindowDC(0) ; DC of entire screen (desktop)
