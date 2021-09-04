@@ -4,7 +4,7 @@
 #include <helper.au3>
 #include <const.au3>
 
-_Singleton ('PlayTogetherAuto', 0)
+_Singleton ('PlayTogetherAuto_main', 0)
 
 If @DesktopHeight / @DesktopWidth <> 0.5625 Then
     MsgBox($MB_OK, "Screen resolution not support", "This PC using not supported screen resolution ratio. Please use the screen with ratio 16:9 (1920:1080 is recommended)")

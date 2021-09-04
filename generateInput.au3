@@ -5,7 +5,7 @@
 #include <WinAPIMisc.au3>
 
 #include <const.au3>
-
+_Singleton ('PlayTogetherAuto_generate_input', 0)
 AutoItSetOption('GUIOnEventMode', 1)
 
 local $X1 = 0

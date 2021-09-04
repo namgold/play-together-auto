@@ -11,8 +11,8 @@ $buttonUseRodY = $screenscale * 653
 $buttonWithdrawRodX = $screenscale * 1670
 $buttonWithdrawRodY = $screenscale * 850
 
-$buttonOpenBagX = $screenscale * 1818
-$buttonOpenBagY = $screenscale * 553
+$buttonOpenBagX = $screenscale * 1834
+$buttonOpenBagY = $screenscale * 562
 $buttonOpenBagColor = dec('E44142')
 
 $buttonStoreFishX = $screenscale * 1267
