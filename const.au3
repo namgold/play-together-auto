@@ -1,4 +1,5 @@
 $inputPath = './settings.ini'
+$logFilePath = './activity.log'
 
 $bagCloseButtonColorRed = dec('C33222')
 $bagCloseButtonColorWhite = dec('FFFFFF')
@@ -11,8 +12,8 @@ $buttonUseRodY = $screenscale * 653
 $buttonWithdrawRodX = $screenscale * 1670
 $buttonWithdrawRodY = $screenscale * 850
 
-$buttonOpenBagX = $screenscale * 1834
-$buttonOpenBagY = $screenscale * 562
+$buttonOpenBagX = $screenscale * 1809
+$buttonOpenBagY = $screenscale * 605
 $buttonOpenBagColor = dec('E44142')
 
 $buttonStoreFishX = $screenscale * 1267
@@ -68,7 +69,3 @@ $rodCheckMarkColor = dec('82FB28')
 
 global $bagItemX = [1163, 1456, 1757, 1163, 1456, 1757]
 global $bagItemY = [382, 382, 382, 764, 764, 764]
-
-global $buttonFixRodX = [1162, 1461, 1755, 1162, 1456, 1755]
-global $buttonFixRodY = [525, 525, 525, 903, 903, 903]
-$buttonFixRodColor = dec('F15E4E')

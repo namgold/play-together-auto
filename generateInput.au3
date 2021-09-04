@@ -5,6 +5,7 @@
 #include <WinAPIMisc.au3>
 #include <Misc.au3>
 
+#include <debugBox.au3>
 #include <const.au3>
 _Singleton ('PlayTogetherAuto_generate_input', 0)
 AutoItSetOption('GUIOnEventMode', 1)
@@ -34,10 +35,12 @@ func Capture()
 EndFunc
 
 Func _Cancel()
+    _log('User canceled')
     $isexit = true
 EndFunc
 
 Func _Generate()
+    _log('User pressed save')
     IniWrite($inputPath, "Exclaimation Mark", "exclaimationX", $X2)
     IniWrite($inputPath, "Exclaimation Mark", "exclaimationY", $Y2)
 
@@ -78,15 +81,11 @@ func generateInput()
             GUICtrlSetData($Label1, genLabel())
             $labelUpdated = false
         endif
-        $nMsg = GUIGetMsg()
-        Switch $nMsg
-            Case $GUI_EVENT_CLOSE
-                isexit = true
-
-        EndSwitch
-        ;~ GUICtrlSetData($Label1, 'a')
     WEnd
     GUIDelete($Form1)
-    if $isexit then exit
+    if $isexit then
+        _log('Exiting program')
+        exit
+    endif
 EndFunc
 

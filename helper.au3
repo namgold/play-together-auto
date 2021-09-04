@@ -5,7 +5,7 @@
 ;~ #include <WinAPISysWin.au3>
 ;~ #include <WindowsConstants.au3>
 
-#include <const.au3>
+#include-once <const.au3>
 #include <generateInput.au3>
 
 global $exclaimationX = 0
@@ -14,19 +14,33 @@ global $rodPosition = 1
 global $minimumIdleRod = 13
 global $maximumTimeFishing = 60
 
+local $deep = 0
 func getInput()
-    _log('Reading exclaimation position')
+    $deep = $deep + 1
+    _log('Starting get input with deep' & $deep)
+    if $deep > 10 Then
+        _log('Deep is too high: ' & $deep)
+        alert('Something went wrong, please try again.')
+        _log('Exting program')
+        Exit
+    endif
+    _log('Checking is input file exists')
     if FileExists($inputPath) then
+        _log('Input file found, reading')
         $exclaimationX = IniRead($inputPath, "Exclaimation Mark", "exclaimationX", 0)
         $exclaimationY = IniRead($inputPath, "Exclaimation Mark", "exclaimationY", 0)
         $rodPosition = IniRead($inputPath, "General", "RodPosition", 1)
         $minimumIdleRod = IniRead($inputPath, "General", "MinimumIdleRod", 13)
         $maximumTimeFishing = IniRead($inputPath, "General", "MaximumTimeFishing", 60)
+        _log('Read done')
     else
+        _log('Input file not found, creating new one')
         _log('Capturing exclaimation position')
         generateInput()
+        _log('Created input file, now read again')
         getInput()
     endif
+    _log('Exit get input')
 endfunc
 
 func getCurrentExclaimationColor()
@@ -58,7 +72,7 @@ EndFunc
 #region Button clicking
 global $timeStartClicked = TimerInit()
 func clickDebounced($x, $y, $clicks = 1, $speed = 100, $clickspeed = 2)
-    if (TimerDiff($timeStartClicked) > $speed)
+    if TimerDiff($timeStartClicked) > $speed then
         $timeStartClicked = TimerInit()
         MouseClick($MOUSE_CLICK_LEFT, $x, $y, $clicks, $clickspeed)
     endif
@@ -164,27 +178,37 @@ EndFunc
 
 #region complex select
 func doBagStuff()
-    _log('Doing bag stuff')
+    _log('Start doing bag stuff')
     while isTabToolNotSelected()
         _log('Clicking tab tool')
         clickTabTool()
     wend
+    _log('Tab tool opened')
 
+    _log('Detecting is rod need fix')
+    sleep(200)
     if isRodNeedFix() Then
+        _log('Start fixing rod')
+
+        _log('Clicking fix rod')
         while not isButtonPayMoneyFixRodShown()
             clickFixRod()
         wend
+        _log('Clicking pay money')
         while isButtonPayMoneyFixRodShown()
             clickPayMoneyFixRod()
         wend
+        _log('Waiting for success show')
         while not isButtonFixedRodShown()
         wend
+        _log('Click success')
         while isButtonFixedRodShown()
             clickFixedRod()
         wend
 
     endif
 
+    _log('Close/select until bag is closed and button open bag shown')
     while isBagOpened() and not isOpenBagButtonShown()
         if rodCheckMarkExits() then
             _log('Clicking close bag')
@@ -194,6 +218,7 @@ func doBagStuff()
             clickSelectRod()
         endif
     wend
+    _log('End doing bag stuff')
     Sleep(200)
 endfunc
 
