@@ -18,6 +18,8 @@ func getInput()
         $exclaimationX = IniRead($inputPath, "Exclaimation Mark", "exclaimationX", "")
         $exclaimationY = IniRead($inputPath, "Exclaimation Mark", "exclaimationY", "")
         $rodPosition = IniRead($inputPath, "General", "RodPosition", 1)
+        $minimumIdleRod = IniRead($inputPath, "General", "MinimumIdleRod", 13)
+        $maximumTimeFishing = IniRead($inputPath, "General", "MaximumTimeFishing", 60)
     else
         _log('Capturing exclaimation position')
         generateInput()

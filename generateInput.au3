@@ -39,7 +39,13 @@ EndFunc
 Func _Generate()
     IniWrite($inputPath, "Exclaimation Mark", "exclaimationX", $X2)
     IniWrite($inputPath, "Exclaimation Mark", "exclaimationY", $Y2)
-    IniWrite($inputPath, "General", "RodPosition", 1)
+
+    $rodPosition = IniRead($inputPath, "General", "RodPosition", 1)
+    $minimumIdleRod = IniRead($inputPath, "General", "MinimumIdleRod", 13)
+    $maximumTimeFishing = IniRead($inputPath, "General", "MaximumTimeFishing", 60)
+    IniWrite($inputPath, "General", "RodPosition", $rodPosition)
+    IniWrite($inputPath, "General", "MinimumIdleRod", $minimumIdleRod)
+    IniWrite($inputPath, "General", "MaximumTimeFishing", $maximumTimeFishing)
     $isdone = true
 EndFunc
 
