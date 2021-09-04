@@ -3,6 +3,7 @@
 #include <StaticConstants.au3>
 #include <WindowsConstants.au3>
 #include <WinAPIMisc.au3>
+#include <Misc.au3>
 
 #include <const.au3>
 _Singleton ('PlayTogetherAuto_generate_input', 0)
