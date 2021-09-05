@@ -78,13 +78,17 @@ func clickDebounced($x, $y, $clicks = 1, $speed = 100, $clickspeed = 2)
     endif
 EndFunc
 
-global $emu = WinGetHandle('Bộ giả lập android Nox')
+global $nox = WinGetHandle('Bộ giả lập android Nox')
 if @error <> 0 then
-    $emu = WinGetHandle('BlueStacks');
+    $nox = false
 endif
 
 func click($x, $y, $clicks = 1, $speed = 100)
-    ControlClick($emu, '', $emu, 'left', $clicks, $x, $y)
+    if $nox then
+        ControlClick($nox, '', $nox, 'left', $clicks, $x, $y)
+    else
+        MouseClick ($MOUSE_CLICK_LEFT, $x, $y, $clicks, 2)
+    endif
     sleep($speed)
 EndFunc
 
