@@ -16,7 +16,7 @@ SplashTextOn($title, $currentMsg, '350', '35', '0', '0', 37, '', '', '')
 
 func _log($msg, $isWriteToLog = true)
     if ($msg <> $currentMsg) then
-        $formatedMsg = $consecutiveMissed & '/' & $successCount & '/' & $loopCount & ' ' & $msg
+        $formatedMsg = ($consecutiveMissed <= 0 ? 0 : $consecutiveMissed) & '/' & $successCount & '/' & $loopCount & ' ' & $msg
         ControlSetText($title, '', 'Static1', $formatedMsg)
         if $isWriteToLog then
             _FileWriteLog($logFile,  $formatedMsg)

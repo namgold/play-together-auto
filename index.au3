@@ -3,9 +3,16 @@
 #include-once <debugBox.au3>
 #include <const.au3>
 #include <helper.au3>
+
+global $exclaimationX = 0
+global $exclaimationY = 0
+global $rodPosition = 1
+global $minimumIdleRod = 13
+global $maximumTimeFishing = 60
+_Singleton ('PlayTogetherAuto_main', 0)
+
 _log('----------------------- Program started -----------------------')
 
-_Singleton ('PlayTogetherAuto_main', 0)
 
 _log('Checking resolution')
 If @DesktopHeight / @DesktopWidth <> 0.5625 Then
@@ -43,55 +50,75 @@ While True
     local $startUsedRodTime
     local $beginLoopTime
     local $missedRod
+    local $currentTimeDiff
+    local $detectedisBagOpened = false
+    local $detectedisTabToolOpened = false
+    local $detectedisFishing = false
     _logLoopStarted()
     _log('-------- new loop --------')
     _log('Started new loop')
 
-    _log('Spam rod-bag')
-    $beginLoopTime = TimerInit()
-    While isOpenBagButtonShown() and TimerDiff($beginLoopTime) < 5000
-        $startUsedRodTime = TimerInit()
-        clickUseRod()
-        clickOpenBag()
-    WEnd
+    #region Start detecting windows
+    _log('Start detecting windows')
+    if isMissionOpened()                then closeMission()
+    if isPhoneOpened()                  then closePhone()
+    if isOtherProfileOpened()           then closeOtherProfile()
+    if isShopOpened()                   then closeShop()
+    if isButtonPayMoneyFixRodShown()    then payMoneyFixRod()
+    if isButtonFixedRodShown()          then successFixRod()
+    if isStoreFishButtonShown()         then storeFish()
+    if isStoreTrashButtonShown()        then storeTrash()
 
-    _log('Detecting is bag opened')
-    sleep(200)
-    $beginLoopTime = TimerInit()
-    do
-        local $currentTimeDiff = TimerDiff($beginLoopTime)
-        _log('Detecting is bag opened ' & Round($currentTimeDiff/100)/10 & '/' & $MinimumIdleRod & 's', false)
-        if isBagOpened() then
-            _log('Detected bag opened')
-            doBagStuff()
-            ;~ _log('Wait for bag completely closed')
-            ;~ $beginLoopTime = TimerInit()
-            ;~ While not isOpenBagButtonShown() and $currentTimeDiff < 5000
-            ;~ WEnd
-            _log('Clicking use rod')
+    if isBagOpened()            then $detectedisBagOpened = true
+    if isTabToolSelected()      then $detectedisTabToolOpened = true
+    if isFishing()              then $detectedisFishing = true
+    _log('End detecting windows')
+    #endregion
+
+    if not $detectedisFishing then
+        if not $detectedisBagOpened then
+            $startUsedRodTime = TimerInit()
+            LoopOn(isOpenBagButtonShown, clickRodBag, 'Spam clicking rod-bag')
+
+            _log('Detecting is bag opened')
+            sleep(200)
             $beginLoopTime = TimerInit()
-            While isOpenBagButtonShown() and $currentTimeDiff < 5000
-                $startUsedRodTime = TimerInit()
-                clickUseRod()
-            WEnd
-            ExitLoop
+            do
+                local $currentTimeDiff = TimerDiff($beginLoopTime)
+                _log('Detecting is bag opened ' & Round($currentTimeDiff/100)/10 & '/' & '5' & 's', false)
+                if isBagOpened() then
+                    _log('Detected bag opened')
+                    doBagStuff()
+                    _log('Clicking use rod')
+                    $beginLoopTime = TimerInit()
+                    While isOpenBagButtonShown() and $currentTimeDiff < 5000
+                        $startUsedRodTime = TimerInit()
+                        clickUseRod()
+                    WEnd
+                    ExitLoop
+                endif
+            until $currentTimeDiff >= 5000
+        else
+            doBagStuff()
         endif
-    until $currentTimeDiff >= 5000
 
-    $missedRod = false
-    _log('Idle rod for ' & $MinimumIdleRod & 's')
-    do
-        local $currentTimeDiff = TimerDiff($startUsedRodTime)
-        _log('Idle rod for ' & Round($currentTimeDiff/100)/10 & '/' & $MinimumIdleRod & 's' , false)
-        if isOpenBagButtonShown() Then
-            _log('Open bag button found, probably missed fish')
-            $missedRod = true
-        EndIf
-    until $currentTimeDiff >= $MinimumIdleRod * 1000 or $missedRod
-    if $missedRod then
-        _log('End loop, fish failed')
-        _log('-------- end loop --------')
-        ContinueLoop
+        $missedRod = false
+        _log('Idle rod for ' & $MinimumIdleRod & 's')
+        do
+            local $currentTimeDiff = TimerDiff($startUsedRodTime)
+            _log('Idle rod for ' & Round($currentTimeDiff/100)/10 & '/' & $MinimumIdleRod & 's' , false)
+            if isOpenBagButtonShown() Then
+                _log('Open bag button found, probably missed fish')
+                $missedRod = true
+            EndIf
+        until $currentTimeDiff >= $MinimumIdleRod * 1000 or $missedRod
+        if $missedRod then
+            _log('End loop, fish failed')
+            _log('-------- end loop --------')
+            ContinueLoop
+        endif
+    else
+        $startUsedRodTime = TimerInit()
     endif
 
     Local $initColor = getCurrentExclaimationColor()
@@ -103,11 +130,15 @@ While True
         $currentTimeDiff = TimerDiff($startUsedRodTime)
         _log('Detecting exclamimation ' & Round($currentTimeDiff/100)/10 & '/' & $MaximumTimeFishing & 's', false)
         $currentColor = getCurrentExclaimationColor()
+        alert($currentTimeDiff)
+        alert($MaximumTimeFishing)
+        alert($missedRod)
         if isOpenBagButtonShown() Then
             _log('Open bag button found, probably missed fish')
             $missedRod = true
         EndIf
     Until $initColor <> $currentColor Or $currentTimeDiff > $MaximumTimeFishing * 1000 or $missedRod
+    alert($initColor & ' ' & $currentColor)
 
     if $missedRod then
         _log('End loop, fish failed')
@@ -124,18 +155,12 @@ While True
     local $isSuccess = false
     Do
         if isStoreFishButtonShown() then
-            _log('Store fish button found, storing fish')
-            while isStoreFishButtonShown()
-                clickStoreFish()
-            wend
+            storeFish()
             $isSuccess = true
             ExitLoop
         Else
             if isStoreTrashButtonShown() Then
-                _log('Store trash button found, storing trash')
-                while isStoreTrashButtonShown()
-                    clickStoreTrash()
-                wend
+                storeTrash()
                 $isSuccess = true
                 ExitLoop
             Else

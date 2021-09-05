@@ -8,12 +8,6 @@
 #include-once <const.au3>
 #include <generateInput.au3>
 
-global $exclaimationX = 0
-global $exclaimationY = 0
-global $rodPosition = 1
-global $minimumIdleRod = 13
-global $maximumTimeFishing = 60
-
 local $deep = 0
 func getInput()
     $deep = $deep + 1
@@ -43,6 +37,41 @@ func getInput()
     _log('Exit get input')
 endfunc
 
+func autoTrue()
+    return true
+endfunc
+
+func doNotThing()
+endfunc
+
+func LoopOn($condition = autoTrue, $body = doNotThing, $logTitle = '', $timeout = 5, $beginLoopTime = TimerInit())
+    if StringLen ($logTitle) > 0 then
+        _log($logTitle & ': ' & $timeout & 's')
+    endif
+    local $currentTimerDiff = TimerDiff($beginLoopTime)
+    while $condition() and $currentTimerDiff < $timeout * 1000
+        if StringLen ($logTitle) > 0 then
+            _log($logTitle & ': ' & Round($currentTimerDiff/100)/10 & '/' & $timeout & 's', false)
+        endif
+        $body()
+        $currentTimerDiff = TimerDiff($beginLoopTime)
+    wend
+endfunc
+
+func LoopOnNot($condition = autoTrue, $body = doNotThing, $logTitle = '', $timeout = 5, $beginLoopTime = TimerInit())
+    if StringLen ($logTitle) > 0 then
+        _log($logTitle & ': ' & $timeout & 's')
+    endif
+    local $currentTimerDiff = TimerDiff($beginLoopTime)
+    while not $condition() and $currentTimerDiff < $timeout * 1000
+        if StringLen ($logTitle) > 0 then
+            _log($logTitle & ': ' & Round($currentTimerDiff/100)/10 & '/' & $timeout & 's', false)
+        endif
+        $body()
+        $currentTimerDiff = TimerDiff($beginLoopTime)
+    wend
+endfunc
+
 func getCurrentExclaimationColor()
     return PixelGetColor($exclaimationX, $exclaimationY)
 EndFunc
@@ -59,24 +88,17 @@ endfunc
 ;~ $hPen = _WinAPI_CreatePen($PS_SOLID, 5, 0)
 ;~ $o_Orig = _WinAPI_SelectObject($hDC, $hPen)
 
-func drawCross()
-    $length=30
-    _WinAPI_DrawLine($hDC, $exclaimationX - $length/2, $exclaimationY, $exclaimationX + $length/2, $exclaimationY)
-    _WinAPI_DrawLine($hDC, $exclaimationX, $exclaimationY - $length/2, $exclaimationX, $exclaimationY + $length/2)
-    _WinAPI_RedrawWindow(_WinAPI_GetDesktopWindow(), 0, 0)
-    _WinAPI_RedrawWindow(_WinAPI_GetDesktopWindow(), 0, 0, $RDW_ERASE)
-    _WinAPI_RedrawWindow(_WinAPI_GetDesktopWindow(), 0, 0, $RDW_INVALIDATE + $RDW_ALLCHILDREN)
-
-EndFunc
+;~ func drawCross()
+;~     $length=30
+;~     _WinAPI_DrawLine($hDC, $exclaimationX - $length/2, $exclaimationY, $exclaimationX + $length/2, $exclaimationY)
+;~     _WinAPI_DrawLine($hDC, $exclaimationX, $exclaimationY - $length/2, $exclaimationX, $exclaimationY + $length/2)
+;~     _WinAPI_RedrawWindow(_WinAPI_GetDesktopWindow(), 0, 0)
+;~     _WinAPI_RedrawWindow(_WinAPI_GetDesktopWindow(), 0, 0, $RDW_ERASE)
+;~     _WinAPI_RedrawWindow(_WinAPI_GetDesktopWindow(), 0, 0, $RDW_INVALIDATE + $RDW_ALLCHILDREN)
+;~ EndFunc
 
 #region Button clicking
 global $timeStartClicked = TimerInit()
-func clickDebounced($x, $y, $clicks = 1, $speed = 100, $clickspeed = 2)
-    if TimerDiff($timeStartClicked) > $speed then
-        $timeStartClicked = TimerInit()
-        MouseClick($MOUSE_CLICK_LEFT, $x, $y, $clicks, $clickspeed)
-    endif
-EndFunc
 
 global $nox = WinGetHandle('Bộ giả lập android Nox')
 if @error <> 0 then
@@ -87,37 +109,44 @@ func click($x, $y, $clicks = 1, $speed = 100)
     if $nox then
         ControlClick($nox, '', $nox, 'left', $clicks, $x, $y)
     else
-        MouseClick ($MOUSE_CLICK_LEFT, $x, $y, $clicks, 2)
+        MouseClick($MOUSE_CLICK_LEFT, $x, $y, $clicks, 2)
     endif
     sleep($speed)
 EndFunc
 
+func clickDebounced($x, $y, $clicks = 1, $speed = 100)
+    if TimerDiff($timeStartClicked) > $speed then
+        $timeStartClicked = TimerInit()
+        click($x, $y, $clicks, $speed)
+    endif
+EndFunc
+
 func clickUseRod()
-    click($buttonUseRodX, $buttonUseRodY, 1, 200)
+    clickDebounced($buttonUseRodX, $buttonUseRodY, 1, 200)
 EndFunc
 
 func clickWithdrawRod()
-    click($buttonWithdrawRodX, $buttonWithdrawRodY, 10, 10)
+    clickDebounced($buttonWithdrawRodX, $buttonWithdrawRodY, 10, 10)
 EndFunc
 
 func clickOpenBag()
-    click($buttonOpenBagX, $buttonOpenBagY, 1, 0) ;100 trở lên thì sleep vô tận cmnl, wtf?
+    clickDebounced($buttonOpenBagX, $buttonOpenBagY, 1, 0) ;100 trở lên thì sleep vô tận cmnl, wtf?
 EndFunc
 
 func clickTabTool()
-    click($buttonTabTool1X, $buttonTabTool1Y, 1, 200)
+    clickDebounced($buttonTabTool1X, $buttonTabTool1Y, 1, 200)
 EndFunc
 
 func clickCloseBag()
-    click($buttonCloseBag3X, $buttonCloseBag3Y, 1, 200)
+    clickDebounced($buttonCloseBag3X, $buttonCloseBag3Y, 1, 200)
 EndFunc
 
 func clickStoreFish()
-    click($buttonStoreFishX, $buttonStoreFishY, 1, 200)
+    clickDebounced($buttonStoreFishX, $buttonStoreFishY, 1, 200)
 EndFunc
 
 func clickStoreTrash()
-    click($buttonStoreTrashX, $buttonStoreTrashY, 1, 200)
+    clickDebounced($buttonStoreTrashX, $buttonStoreTrashY, 1, 200)
 EndFunc
 
 func clickFixRod()
@@ -125,39 +154,80 @@ func clickFixRod()
 EndFunc
 
 func clickPayMoneyFixRod()
-    click($buttonPayMoneyFixRodX, $buttonPayMoneyFixRodY, 1, 200)
+    clickDebounced($buttonPayMoneyFixRodX, $buttonPayMoneyFixRodY, 1, 200)
 EndFunc
 
 func clickFixedRod()
-    click($buttonFixedRodX, $buttonFixedRodY, 1, 200)
+    clickDebounced($buttonFixedRodX, $buttonFixedRodY, 1, 200)
 EndFunc
 
 func clickSelectRod()
-    click(pick($bagItemX), pick($bagItemY), 1, 200)
+    clickDebounced(pick($bagItemX), pick($bagItemY), 1, 200)
 EndFunc
+
+func clickCloseMission()
+    clickDebounced($buttonCloseMissionX, $buttonCloseMissionY, 1, 200)
+endfunc
+
+func clickClosePhone()
+    clickDebounced($boardPhoneButtonClose1X, $boardPhoneButtonClose1Y, 1, 2000)
+endfunc
+
+func clickCloseOtherProfile()
+    clickDebounced($boardOtherProfileButtonX, $boardOtherProfileButtonY, 1, 2000)
+endfunc
+
+func clickCloseShop()
+    clickDebounced($shopCloseButtonX, $shopCloseButtonY, 1, 2000)
+endfunc
 #endregion
 
 #region Detecting
+func isMissionOpened()
+    return PixelGetColor($boardMission1X, $boardMission1Y) == $boardMission1Color _
+       and PixelGetColor($boardMission2X, $boardMission2Y) == $boardMission2Color _
+       and not isOpenBagButtonShown()
+EndFunc
+
+func isPhoneOpened()
+    return PixelGetColor($boardPhoneButtonClose1X, $boardPhoneButtonClose1Y) == $boardPhoneButtonClose12345Color _
+       and PixelGetColor($boardPhoneButtonClose2X, $boardPhoneButtonClose2Y) == $boardPhoneButtonClose12345Color _
+       and PixelGetColor($boardPhoneButtonClose3X, $boardPhoneButtonClose3Y) == $boardPhoneButtonClose12345Color _
+       and PixelGetColor($boardPhoneButtonClose4X, $boardPhoneButtonClose4Y) == $boardPhoneButtonClose12345Color _
+       and PixelGetColor($boardPhoneButtonClose5X, $boardPhoneButtonClose5Y) == $boardPhoneButtonClose12345Color _
+       and PixelGetColor($boardPhoneButtonClose6X, $boardPhoneButtonClose6Y) <> $boardPhoneButtonClose6NotColor _
+       and PixelGetColor($boardPhoneButtonMailX, $boardPhoneButtonMailY) == $boardPhoneButtonMailColor _
+       and PixelGetColor($boardPhoneButtonPlazaX, $boardPhoneButtonPlazaY) == $boardPhoneButtonPlazaColor _
+       and not isOpenBagButtonShown()
+EndFunc
+
 func isOpenBagButtonShown()
     return PixelGetColor($buttonOpenBagX, $buttonOpenBagY) == $buttonOpenBagColor
 EndFunc
 
 func isBagOpened()
     return not isOpenBagButtonShown() _
-            And isCloseBagButtonShown() _
-            And PixelGetColor($bagOpenedX, $bagOpenedY) == $bagOpenedColor
+       And isCloseBagButtonShown() _
+       And PixelGetColor($bagOpenedX, $bagOpenedY) == $bagOpenedColor
+EndFunc
+
+func isTabToolSelected()
+    return isBagOpened() _
+       And PixelGetColor($buttonTabTool1X, $buttonTabTool1Y) <> $buttonTabTool1Color _
+       And PixelGetColor($buttonTabTool2X, $buttonTabTool2Y) <> $buttonTabTool2Color _
+       And PixelGetColor($buttonTabTool3X, $buttonTabTool3Y) == $buttonTabTool3Color
 EndFunc
 
 func isTabToolNotSelected()
     return isBagOpened() _
-            And PixelGetColor($buttonTabTool1X, $buttonTabTool1Y) == $buttonTabTool1Color _
-            And PixelGetColor($buttonTabTool2X, $buttonTabTool2Y) == $buttonTabTool2Color _
-            And PixelGetColor($buttonTabTool3X, $buttonTabTool3Y) <> $buttonTabTool3Color
+       And PixelGetColor($buttonTabTool1X, $buttonTabTool1Y) == $buttonTabTool1Color _
+       And PixelGetColor($buttonTabTool2X, $buttonTabTool2Y) == $buttonTabTool2Color _
+       And PixelGetColor($buttonTabTool3X, $buttonTabTool3Y) <> $buttonTabTool3Color
 EndFunc
 
 func isCloseBagButtonShown()
     return PixelGetColor($buttonCloseBag1X, $buttonCloseBag1Y) == $buttonCloseBag1Color _
-        And PixelGetColor($buttonCloseBag2X, $buttonCloseBag2Y) == $buttonCloseBag2Color
+       And PixelGetColor($buttonCloseBag2X, $buttonCloseBag2Y) == $buttonCloseBag2Color
 EndFunc
 
 func isStoreFishButtonShown()
@@ -183,50 +253,120 @@ EndFunc
 func isButtonFixedRodShown()
     return PixelGetColor($buttonFixedRodX, $buttonFixedRodY) == $buttonFixedRodColor
 EndFunc
+
+func isOtherProfileOpened()
+    return PixelGetColor($boardOtherProfile1X, $boardOtherProfile1Y) == $boardOtherProfile1Color _
+       And PixelGetColor($boardOtherProfileButtonX, $boardOtherProfileButtonY) == $boardOtherProfileButtonColor
+EndFunc
+
+func isShopOpened()
+    return PixelGetColor($shop1X, $shop1Y) == $shop1Color _
+       And PixelGetColor($shop2X, $shop2Y) == $shop2Color _
+       And PixelGetColor($shopCloseButtonX, $shopCloseButtonY) == $shopCloseButtonColor
+EndFunc
+
+func isFishing()
+    return not isOpenBagButtonShown() _
+       and not isBagOpened() _
+       and not isPhoneOpened() _
+       and not isMissionOpened() _
+       and not isShopOpened() _
+       and not isOtherProfileOpened() _
+       and not isButtonFixedRodShown() _
+       and not isButtonPayMoneyFixRodShown() _
+       and not isStoreFishButtonShown()
+EndFunc
 #endregion
 
 #region complex select
+func clickRodBag()
+    clickUseRod()
+    clickOpenBag()
+endfunc
+
+func closeMission()
+    _log('Start closing mission')
+    LoopOn(isMissionOpened, clickCloseMission, 'Closing mission')
+    LoopOnNot(isOpenBagButtonShown, doNotThing)
+    _log('End closing mission')
+endfunc
+
+func closePhone()
+    _log('Start closing phone')
+    LoopOn(isPhoneOpened, clickClosePhone, 'Closing phone')
+    LoopOnNot(isOpenBagButtonShown, doNotThing)
+    _log('End closing phone')
+endfunc
+
+func closeOtherProfile()
+    _log('Start closing other''s profile')
+    LoopOn(isOtherProfileOpened, clickCloseOtherProfile, 'Closing other''s profile')
+    LoopOnNot(isOpenBagButtonShown, doNotThing)
+    _log('End closing other''s profile')
+endfunc
+
+func closeShop()
+    _log('Start closing shop')
+    LoopOn(isShopOpened, clickCloseShop, 'Closing shop')
+    LoopOnNot(isOpenBagButtonShown, doNotThing)
+    _log('End closing shop')
+endfunc
+
+func storeFish()
+    _log('Start store fish')
+    LoopOn(isStoreFishButtonShown, clickStoreFish, 'Storing fish')
+    LoopOnNot(isOpenBagButtonShown, doNotThing)
+    _log('End store fish')
+endfunc
+
+func storeTrash()
+    _log('Start store trash')
+    LoopOn(isStoreTrashButtonShown, clickStoreTrash, 'Storing trash')
+    LoopOnNot(isOpenBagButtonShown, doNotThing)
+    _log('End store trash')
+endfunc
+
+func selectRodOrExit()
+    if rodCheckMarkExits() then
+        _log('Clicking close bag')
+        clickCloseBag()
+    Else
+        _log('Clicking select rod')
+        clickSelectRod()
+    endif
+endfunc
+
+func successFixRod()
+    _log('Start click success fix rod')
+    LoopOn(isButtonFixedRodShown, clickFixedRod, 'Clicking')
+    _log('End pay money fix rod')
+
+endfunc
+
+func payMoneyFixRod()
+    _log('Start pay money fix rod')
+    LoopOn(isButtonPayMoneyFixRodShown, clickPayMoneyFixRod, 'Paying money fix rod')
+    LoopOnNot(isButtonFixedRodShown, doNotThing, 'Waiting for success show')
+    successFixRod()
+    _log('End pay money fix rod')
+
+endfunc
+
 func doBagStuff()
     _log('Start doing bag stuff')
-    while isTabToolNotSelected()
-        _log('Clicking tab tool')
-        clickTabTool()
-    wend
-    _log('Tab tool opened')
+    LoopOn(isTabToolNotSelected, clickTabTool, 'Clicking tab tool')
 
-    _log('Detecting is rod need fix')
+    _log('Detecting is rod needs fix')
     sleep(200)
     if isRodNeedFix() Then
-        _log('Start fixing rod')
-
-        _log('Clicking fix rod')
-        while not isButtonPayMoneyFixRodShown()
-            clickFixRod()
-        wend
-        _log('Clicking pay money')
-        while isButtonPayMoneyFixRodShown()
-            clickPayMoneyFixRod()
-        wend
-        _log('Waiting for success show')
-        while not isButtonFixedRodShown()
-        wend
-        _log('Click success')
-        while isButtonFixedRodShown()
-            clickFixedRod()
-        wend
-
+        _log('Detected rod needs fix')
+        LoopOnNot(isButtonPayMoneyFixRodShown, clickFixRod, 'Clicking fix rod')
+        payMoneyFixRod()
+        LoopOn(isButtonFixedRodShown, clickFixedRod, 'Click success')
     endif
 
-    _log('Close/select until bag is closed and button open bag shown')
-    while isBagOpened() and not isOpenBagButtonShown()
-        if rodCheckMarkExits() then
-            _log('Clicking close bag')
-            clickCloseBag()
-        Else
-            _log('Clicking select rod')
-            clickSelectRod()
-        endif
-    wend
+    LoopOn(isBagOpened, selectRodOrExit, 'Closing/selecting until bag is closed and button open bag shown')
+
     _log('End doing bag stuff')
     Sleep(200)
 endfunc

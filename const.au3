@@ -69,3 +69,59 @@ $rodCheckMarkColor = dec('82FB28')
 
 global $bagItemX = [1163, 1456, 1757, 1163, 1456, 1757]
 global $bagItemY = [382, 382, 382, 764, 764, 764]
+
+$boardMission1X = $screenscale * 1560
+$boardMission1Y = $screenscale * 480
+$boardMission1Color = dec('FFFFFF')
+
+$boardMission2X = $screenscale * 1557
+$boardMission2Y = $screenscale * 281
+$boardMission2Color = dec('5AC8FF')
+
+$buttonCloseMissionX = $screenscale * 1512
+$buttonCloseMissionY = $screenscale * 95
+
+$boardPhoneButtonClose1X = $screenscale * 1795
+$boardPhoneButtonClose1Y = $screenscale * 86
+$boardPhoneButtonClose2X = $screenscale * 1787
+$boardPhoneButtonClose2Y = $screenscale * 78
+$boardPhoneButtonClose3X = $screenscale * 1807
+$boardPhoneButtonClose3Y = $screenscale * 94
+$boardPhoneButtonClose4X = $screenscale * 1786
+$boardPhoneButtonClose4Y = $screenscale * 92
+$boardPhoneButtonClose5X = $screenscale * 1804
+$boardPhoneButtonClose5Y = $screenscale * 73
+$boardPhoneButtonClose12345Color = dec('CCAEAE')
+
+$boardPhoneButtonClose6X = $screenscale * 1771
+$boardPhoneButtonClose6Y = $screenscale * 94
+$boardPhoneButtonClose6NotColor = dec('CCAEAE')
+
+$boardPhoneButtonMailX = $screenscale * 1367
+$boardPhoneButtonMailY = $screenscale * 944
+$boardPhoneButtonMailColor = dec('FBF3EA')
+
+$boardPhoneButtonPlazaX = $screenscale * 1724
+$boardPhoneButtonPlazaY = $screenscale * 977
+$boardPhoneButtonPlazaColor = dec('FBF3EA')
+
+$boardOtherProfile1X = $screenscale * 1494
+$boardOtherProfile1Y = $screenscale * 279
+$boardOtherProfile1Color = dec('FDFDED')
+
+$boardOtherProfileButtonX = $screenscale * 1839
+$boardOtherProfileButtonY = $screenscale * 70
+$boardOtherProfileButtonColor = dec('A49393')
+
+$shop1X = $screenscale * 94
+$shop1Y = $screenscale * 668
+$shop1Color = dec('562A26')
+
+$shop2X = $screenscale * 882
+$shop2Y = $screenscale * 38
+$shop2Color = dec('F5F0DB')
+
+$shopCloseButtonX = $screenscale * 1871
+$shopCloseButtonY = $screenscale * 52
+$shopCloseButtonColor = dec('9F877C')
+
