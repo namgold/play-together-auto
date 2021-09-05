@@ -130,15 +130,11 @@ While True
         $currentTimeDiff = TimerDiff($startUsedRodTime)
         _log('Detecting exclamimation ' & Round($currentTimeDiff/100)/10 & '/' & $MaximumTimeFishing & 's', false)
         $currentColor = getCurrentExclaimationColor()
-        alert($currentTimeDiff)
-        alert($MaximumTimeFishing)
-        alert($missedRod)
         if isOpenBagButtonShown() Then
             _log('Open bag button found, probably missed fish')
             $missedRod = true
         EndIf
     Until $initColor <> $currentColor Or $currentTimeDiff > $MaximumTimeFishing * 1000 or $missedRod
-    alert($initColor & ' ' & $currentColor)
 
     if $missedRod then
         _log('End loop, fish failed')
