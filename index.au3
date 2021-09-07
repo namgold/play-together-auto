@@ -49,7 +49,8 @@ EndFunc
 While True
     local $startUsedRodTime
     local $beginLoopTime
-    local $missedRod
+    local $missedRod = false
+    local $failUseRodAfterBag = false
     local $currentTimeDiff
     local $detectedisBagOpened = false
     local $detectedisTabToolOpened = false
@@ -89,20 +90,24 @@ While True
                 if isBagOpened() then
                     _log('Detected bag opened')
                     doBagStuff()
-                    _log('Clicking use rod')
-                    $beginLoopTime = TimerInit()
-                    While isOpenBagButtonShown() and $currentTimeDiff < 5000
+                    LoopOn(isOpenBagButtonShown, clickUseRod, 'Clicking use rod')
+                    if isOpenBagButtonShown() then
+                        $failUseRodAfterBag = true
+                    else
                         $startUsedRodTime = TimerInit()
-                        clickUseRod()
-                    WEnd
+                    endif
                     ExitLoop
                 endif
             until $currentTimeDiff >= 5000
         else
             doBagStuff()
         endif
+        if $failUseRodAfterBag then
+            _log('End loop, fish failed')
+            _log('-------- end loop --------')
+            ContinueLoop
+        endif
 
-        $missedRod = false
         _log('Idle rod for ' & $MinimumIdleRod & 's')
         do
             local $currentTimeDiff = TimerDiff($startUsedRodTime)
@@ -125,11 +130,13 @@ While True
 
     _log('Detecting exclamimation')
     Local $currentColor
-    $missedRod = false
     Do
         $currentTimeDiff = TimerDiff($startUsedRodTime)
         _log('Detecting exclamimation ' & Round($currentTimeDiff/100)/10 & '/' & $MaximumTimeFishing & 's', false)
         $currentColor = getCurrentExclaimationColor()
+        if isRGBNear($initColor, $currentColor) then
+            $initColor = $currentColor 
+        endif
         if isOpenBagButtonShown() Then
             _log('Open bag button found, probably missed fish')
             $missedRod = true
@@ -151,21 +158,27 @@ While True
     local $isSuccess = false
     Do
         if isStoreFishButtonShown() then
+            _log('Fished successfully')
             storeFish()
             $isSuccess = true
             ExitLoop
         Else
             if isStoreTrashButtonShown() Then
+                _log('Fished trash')
                 storeTrash()
                 $isSuccess = true
                 ExitLoop
             Else
                 if isOpenBagButtonShown() Then
-                    _log('Open bag button found, probably color changed wrong or rod snapped')
-                    _log('Initial color: ' & $initColor)
-                    _log('Changed color: ' & $currentColor)
-
-                    $isSuccess = false
+                    if $initTime < 2500 then
+                        _log('Fish snapped')
+                        $isSuccess = true
+                    else
+                        _log('Open bag button found, probably color changed wrong')
+                        _log('Initial color: ' & $initColor)
+                        _log('Changed color: ' & $currentColor)
+                        $isSuccess = false
+                    endif
                     ExitLoop
                 EndIf
             EndIf

@@ -84,6 +84,17 @@ func pick($arrayPos)
     return $arrayPos[$rodPosition - 1] * $screenscale
 endfunc
 
+func rgb($dec)
+    local $result = [Floor($dec/65536), Floor(Mod($dec, 65536)/256), Mod($dec, 256)]
+    return $result
+endfunc
+
+func isRGBNear($dec1, $dec2)
+    local $rgb1 = rgb($dec1)
+    local $rgb2 = rgb($dec2)
+    return Abs($rgb1[0]-$rgb2[0]) <= 2 and Abs($rgb1[1]-$rgb2[1]) <= 2 and Abs($rgb1[2]-$rgb2[2]) <= 2
+endfunc
+
 ;~ $hDC = _WinAPI_GetWindowDC(0) ; DC of entire screen (desktop)
 ;~ $hPen = _WinAPI_CreatePen($PS_SOLID, 5, 0)
 ;~ $o_Orig = _WinAPI_SelectObject($hDC, $hPen)
@@ -98,8 +109,6 @@ endfunc
 ;~ EndFunc
 
 #region Button clicking
-global $timeStartClicked = TimerInit()
-
 global $nox = WinGetHandle('Bộ giả lập android Nox')
 if @error <> 0 then
     $nox = false
@@ -114,71 +123,73 @@ func click($x, $y, $clicks = 1, $speed = 100)
     sleep($speed)
 EndFunc
 
-func clickDebounced($x, $y, $clicks = 1, $speed = 100)
-    if TimerDiff($timeStartClicked) > $speed then
-        $timeStartClicked = TimerInit()
+local $clickTimer[] = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]
+
+func clickDebounced($id, $x, $y, $clicks = 1, $speed = 100)
+    if TimerDiff($clickTimer[$id]) >= $speed then
+        $clickTimer[$id] = TimerInit()
         click($x, $y, $clicks, $speed)
     endif
 EndFunc
 
 func clickUseRod()
-    clickDebounced($buttonUseRodX, $buttonUseRodY, 1, 200)
+    clickDebounced(0, $buttonUseRodX, $buttonUseRodY, 1, 200)
 EndFunc
 
 func clickWithdrawRod()
-    clickDebounced($buttonWithdrawRodX, $buttonWithdrawRodY, 10, 10)
+    clickDebounced(1, $buttonWithdrawRodX, $buttonWithdrawRodY, 10, 10)
 EndFunc
 
 func clickOpenBag()
-    clickDebounced($buttonOpenBagX, $buttonOpenBagY, 1, 0) ;100 trở lên thì sleep vô tận cmnl, wtf?
+    clickDebounced(2, $buttonOpenBagX, $buttonOpenBagY, 1, 0) ;100 trở lên thì sleep vô tận cmnl, wtf?
 EndFunc
 
 func clickTabTool()
-    clickDebounced($buttonTabTool1X, $buttonTabTool1Y, 1, 200)
+    clickDebounced(3, $buttonTabTool1X, $buttonTabTool1Y, 1, 200)
 EndFunc
 
 func clickCloseBag()
-    clickDebounced($buttonCloseBag3X, $buttonCloseBag3Y, 1, 200)
+    clickDebounced(4, $buttonCloseBag3X, $buttonCloseBag3Y, 1, 200)
 EndFunc
 
 func clickStoreFish()
-    clickDebounced($buttonStoreFishX, $buttonStoreFishY, 1, 200)
+    clickDebounced(5, $buttonStoreFishX, $buttonStoreFishY, 1, 200)
 EndFunc
 
 func clickStoreTrash()
-    clickDebounced($buttonStoreTrashX, $buttonStoreTrashY, 1, 200)
+    clickDebounced(6, $buttonStoreTrashX, $buttonStoreTrashY, 1, 200)
 EndFunc
 
 func clickFixRod()
-    clickDebounced(pick($buttonFixRodX), pick($buttonFixRodY), 1, 2000)
+    clickDebounced(7, pick($buttonFixRodX), pick($buttonFixRodY), 1, 1000)
 EndFunc
 
 func clickPayMoneyFixRod()
-    clickDebounced($buttonPayMoneyFixRodX, $buttonPayMoneyFixRodY, 1, 200)
+    clickDebounced(8, $buttonPayMoneyFixRodX, $buttonPayMoneyFixRodY, 1, 1000)
 EndFunc
 
 func clickFixedRod()
-    clickDebounced($buttonFixedRodX, $buttonFixedRodY, 1, 200)
+    clickDebounced(9, $buttonFixedRodX, $buttonFixedRodY, 1, 1000)
 EndFunc
 
 func clickSelectRod()
-    clickDebounced(pick($bagItemX), pick($bagItemY), 1, 200)
+    clickDebounced(10, pick($bagItemX), pick($bagItemY), 1, 200)
 EndFunc
 
 func clickCloseMission()
-    clickDebounced($buttonCloseMissionX, $buttonCloseMissionY, 1, 200)
+    clickDebounced(11, $buttonCloseMissionX, $buttonCloseMissionY, 1, 200)
 endfunc
 
 func clickClosePhone()
-    clickDebounced($boardPhoneButtonClose1X, $boardPhoneButtonClose1Y, 1, 2000)
+    clickDebounced(12, $boardPhoneButtonClose1X, $boardPhoneButtonClose1Y, 1, 2000)
 endfunc
 
 func clickCloseOtherProfile()
-    clickDebounced($boardOtherProfileButtonX, $boardOtherProfileButtonY, 1, 2000)
+    clickDebounced(13, $boardOtherProfileButtonX, $boardOtherProfileButtonY, 1, 2000)
 endfunc
 
 func clickCloseShop()
-    clickDebounced($shopCloseButtonX, $shopCloseButtonY, 1, 2000)
+    clickDebounced(14, $shopCloseButtonX, $shopCloseButtonY, 1, 2000)
 endfunc
 #endregion
 
@@ -356,7 +367,6 @@ func doBagStuff()
     _log('Start doing bag stuff')
     LoopOn(isTabToolNotSelected, clickTabTool, 'Clicking tab tool')
 
-    _log('Detecting is rod needs fix')
     sleep(200)
     if isRodNeedFix() Then
         _log('Detected rod needs fix')
