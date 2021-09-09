@@ -170,7 +170,7 @@ While True
                 ExitLoop
             Else
                 if isOpenBagButtonShown() Then
-                    if $initTime < 2500 then
+                    if TimerDiff($initTime) < 2500 then
                         _log('Fish snapped')
                         $isSuccess = true
                     else
