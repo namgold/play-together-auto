@@ -135,7 +135,7 @@ While True
         _log('Detecting exclamimation ' & Round($currentTimeDiff/100)/10 & '/' & $MaximumTimeFishing & 's', false)
         $currentColor = getCurrentExclaimationColor()
         if isRGBNear($initColor, $currentColor) then
-            $initColor = $currentColor 
+            $initColor = $currentColor
         endif
         if isOpenBagButtonShown() Then
             _log('Open bag button found, probably missed fish')
@@ -143,7 +143,7 @@ While True
         EndIf
     Until $initColor <> $currentColor Or $currentTimeDiff > $MaximumTimeFishing * 1000 or $missedRod
 
-    if $missedRod then
+    if $currentTimeDiff > $MaximumTimeFishing * 1000 or $missedRod then
         _log('End loop, fish failed')
         _log('-------- end loop --------')
         ContinueLoop
@@ -170,7 +170,9 @@ While True
                 ExitLoop
             Else
                 if isOpenBagButtonShown() Then
-                    if TimerDiff($initTime) < 2500 then
+                    $timeDiff = TimerDiff($initTime)
+                    _log('Time withdrawing: ' & $timeDiff)
+                    if $timeDiff > 2500 then
                         _log('Fish snapped')
                         $isSuccess = true
                     else
